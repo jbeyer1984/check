@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Check\\": "src"
+        }
+    },
+    "require": {
+        "bramus/router": "~1.4",
+        "php-di/php-di": "^6.0"
+    }
+}
