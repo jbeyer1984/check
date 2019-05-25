@@ -5,6 +5,7 @@ namespace Check\App\User\Session;
 
 
 use Check\App\User\LoggedInUser;
+use Check\App\User\UserSession;
 use Check\Globals\Session;
 
 class UserAuthentificationSession
@@ -27,29 +28,29 @@ class UserAuthentificationSession
     {
         $this->session->addAll(
             [
-                'id' => $loggedInUser->getId(),
-                'email' => $loggedInUser->getEmail(),
-                'password' => $loggedInUser->getPassword()
+                'user_id' => $loggedInUser->getId(),
             ]
         );
     }
 
-    public function exists(): bool
+    /**
+     * @param UserSession $userSession
+     * @return bool
+     */
+    public function existsByUserSession(UserSession $userSession): bool
     {
-        return $this->session->existsArrayKeys(
-            [
-                'id',
-                'email',
-                'password'
-            ]
-        );
+        $result = $this->session->query([
+            'user_id',
+        ]);
+        
+        return ($userSession->getId() === $result['user_id']);
     }
 
     public function queryUserId(): int
     {
         $userData = $this->session->query(
             [
-                'id',
+                'user_id',
             ]
         );
         

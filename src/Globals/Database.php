@@ -3,7 +3,9 @@
 
 namespace Check\Globals;
 
-class Database
+use Check\Persistence\PersistenceInterface;
+
+class Database implements PersistenceInterface
 {
     /**
      * @var \PDO
@@ -12,7 +14,7 @@ class Database
     
     public function __construct()
     {
-//        $this->init();
+        $this->init();
     }
 
     private function init()
@@ -20,16 +22,14 @@ class Database
         try {
             $this->connection = new \PDO('mysql:dbname=check;host=127.0.0.1', 'root', 'user20');
         } catch (\Exception $e) {
-            $dump = print_r("connection to DB failed", true);
-            error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** "connection to DB failed" ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
-            
+            /** @TODO jbeyer log Exception */
         }
     }
 
-    private function close()
-    {
-        $this->connection = null;
-    }
+//    private function close()
+//    {
+//        $this->connection = null;
+//    }
 
     /**
      * @param string $sql
@@ -38,12 +38,12 @@ class Database
      */
     public function query(string $sql, array $parameter)
     {
-        $this->init();
+//        $this->init();
         $pdo = $this->connection;
         $statement = $pdo->prepare($sql);
         $statement->execute($parameter);
         $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $this->close();
+//        $this->close();
         
         return $result;
     }
@@ -52,20 +52,38 @@ class Database
      * @param string $sql
      * @param array $parameter
      */
-    public function execute(string $sql, array $parameter)
+    public function execute(string $sql, array $parameter): void
     {
         $this->init();
         $pdo = $this->connection;
         $statement = $pdo->prepare($sql);
         $statement->execute($parameter);
-        $this->close();
+//        $this->close();
     }
 
     /**
-     * @return \PDO
+     * @return int
      */
-    public function getConnection()
+    public function getLastInsertedId(): int
     {
-        return $this->connection;
+//        $this->init();
+        $pdo = $this->connection;
+        $sql = 'SELECT LAST_INSERT_ID() AS id';
+        $statement = $pdo->prepare($sql);
+        $statement->execute([]);
+        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        
+        $id = $result[0]['id'];
+//        $this->close();
+        
+        return $id;
     }
+
+//    /**
+//     * @return \PDO
+//     */
+//    public function getConnection()
+//    {
+//        return $this->connection;
+//    }
 }

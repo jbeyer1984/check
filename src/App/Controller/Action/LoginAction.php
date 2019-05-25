@@ -2,36 +2,22 @@
 
 namespace Check\App\Controller\Action;
 
-use Check\App\User\Factory\UserFactory;
-use Check\App\User\Factory\UserParameterFactory;
-use Check\App\User\Factory\UserRepositoryFactory;
-use Check\App\User\Factory\UserSessionFactory;
+use Check\App\User\Action\Authorize\UserAuthorizationAction;
+use Check\App\User\Action\Authorize\UserSessionAuthorizationAction;
 use Check\Controller\Action\ActionInterface;
-use Check\Globals\Database;
-use Check\Globals\Request;
-use Check\Globals\Session;
+use DI\Container;
 
 class LoginAction implements ActionInterface
 {
     /**
-     * @var Request
+     * @var Container
      */
-    private $request;
-
-    /**
-     * @var Database;
-     */
-    private $db;
-
-    /**
-     * @var Session
-     */
-    private $session;
+    private $container;
 
     /**
      * @var bool
      */
-    private $isUserAuthorized = false;
+    private $isAuthorized = false;
 
     /**
      * @var array
@@ -40,69 +26,47 @@ class LoginAction implements ActionInterface
 
     /**
      * WelcomeAction constructor.
-     * @param Request $request
-     * @param Database $db
-     * @param Session $session
+     * @param Container $container
      */
-    public function __construct(Request $request, Database $db, Session $session)
+    public function __construct(Container $container)
     {
-        $this->request = $request;
-        $this->db      = $db;
-        $this->session = $session;
+        $this->container = $container;
     }
 
+    /**
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     */
     public function execute()
     {
-        $userSessionFactory = new UserSessionFactory();
-        $userAuthentificationSession = $userSessionFactory->createUserAuthentificationSession($this->session);
-        if ($userAuthentificationSession->exists()) {
-            $this->isUserAuthorized = true;
-            $dump = print_r("000", true);
-            error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** "000" ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
-            
+        $userSessionAuthorizationAction = $this->container->get(UserSessionAuthorizationAction::class);
+        $userSessionAuthorizationAction->execute();
+        
+        if ($userSessionAuthorizationAction->isAuthorized()) {
+            $this->isAuthorized = true;
             
             return;
         }
         
-        // authentificate by db
+        $userRepositoryAuthorizationAction = $this->container->get(UserAuthorizationAction::class);
+        $userRepositoryAuthorizationAction->execute();
         
-        $userParameterFactory = new UserParameterFactory();
-        try {
-            $userCredentials = $userParameterFactory->createUserCredentialsByRequest($this->request);   
-        } catch (\Exception $e) {
-            $this->isUserAuthorized = false;
-            
-            return;
-        }
-        $userRepositoryFactory = new UserRepositoryFactory();
-        $userAuthentificationRepository = $userRepositoryFactory->createUserAuthentificationRepository($this->db);
-        $userIsAuthenticated = $userAuthentificationRepository->existsByUserCredentials($userCredentials);
-        
-        if ($userIsAuthenticated) {
-            $userAuthentificationRepository->getFetchedUserData($userCredentials);
-            $userFactory = new UserFactory();
-            $loggedInUser = $userFactory->createLoggedInUser($userAuthentificationRepository, $userCredentials);
-            $userAuthentificationSession->createByLoggedInUser($loggedInUser);
-            // redirect to /user/start
-            $this->isUserAuthorized = true;
+        if (!$userRepositoryAuthorizationAction->isAuthorized()) {
+            $this->isAuthorized = false;
             
             return;
         }
         
-        // not authenticated
-        
-        // set parameters
-        // return
-        
+        $this->isAuthorized = true;
         $this->parameters['dear'] = 'ingrid';
     }
 
     /**
      * @return bool
      */
-    public function isUserAuthorized(): bool
+    public function isAuthorized(): bool
     {
-        return $this->isUserAuthorized;
+        return $this->isAuthorized;
     }
 
     /**

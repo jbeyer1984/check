@@ -4,30 +4,27 @@
 namespace Check\App\Controller\Action;
 
 
-use Check\App\User\Factory\UserFactory;
-use Check\App\User\Factory\UserRepositoryFactory;
-use Check\App\User\Factory\UserSessionFactory;
+use Check\App\User\Action\Authorize\UserSessionAuthorizationAction;
+use Check\App\User\Action\Create\UserCreateAction;
 use Check\Controller\Action\ActionInterface;
-use Check\Globals\Database;
-use Check\Globals\Request;
-use Check\Globals\Session;
+use DI\Container;
 
 class UserStartAction implements ActionInterface
 {
     /**
-     * @var Request
+     * @var Container
      */
-    private $request;
+    private $container;
 
     /**
-     * @var Database;
+     * @var bool
      */
-    private $db;
+    private $isAuthorized = true;
 
-    /**
-     * @var Session
-     */
-    private $session;
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
 
     /**
      * @var array
@@ -35,31 +32,23 @@ class UserStartAction implements ActionInterface
     private $parameters = [];
 
     /**
-     * UserStartAction constructor.
-     * @param Request $request
-     * @param Database $db
-     * @param Session $session
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
      */
-    public function __construct(Request $request, Database $db, Session $session)
-    {
-        $this->request = $request;
-        $this->db      = $db;
-        $this->session = $session;
-    }
-
     public function execute()
     {
-        $userSessionFactory = new UserSessionFactory();
-        $userAuthentificationSession = $userSessionFactory->createUserAuthentificationSession($this->session);
-        if (!$userAuthentificationSession->exists()) {
-            $this->request->redirect('/user/login');
+        $userSessionAuthorizationAction = $this->container->get(UserSessionAuthorizationAction::class);
+        $userSessionAuthorizationAction->execute();
+        if (!$userSessionAuthorizationAction->isAuthorized()) {
+            $this->isAuthorized = false;
+            
+            return;
         }
         
-        $userFactory = new UserFactory();
-        $loggedInUser = $userFactory->createLoggedInUserByPersistence($this->session, $this->db);
+        $userCreationAction = $this->container->get(UserCreateAction::class);
+        $userCreationAction->execute();
         
-        
-        $this->parameters['user'] = $loggedInUser;
+        $this->parameters['user'] = $userCreationAction->getLoggedInUser();
     }
 
     /**
@@ -68,5 +57,13 @@ class UserStartAction implements ActionInterface
     public function getParameter()
     {
         return $this->parameters;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAuthorized(): bool
+    {
+        return $this->isAuthorized;
     }
 }

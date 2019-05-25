@@ -3,7 +3,6 @@
 namespace Check;
 
 use Check\Utility\Router;
-use DI\Container;
 
 class Bootstrap
 {
@@ -17,8 +16,6 @@ class Bootstrap
         define('ROOT', dirname(__DIR__));
         define('PUBLIC', implode(DIRECTORY_SEPARATOR, [ROOT,  'public']));
         define('VIEW', implode(DIRECTORY_SEPARATOR, [ROOT,  'public', 'view']));
-
-        $container = new Container();
 
         $router = new Router();
         $router->route();

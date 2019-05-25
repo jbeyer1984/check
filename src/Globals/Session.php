@@ -6,11 +6,13 @@ namespace Check\Globals;
 
 class Session
 {
+    /**
+     * @var string
+     */
+    private $id;
+    
     public function __construct()
     {
-        $dump = print_r("session constr", true);
-        error_log(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' in ' . __METHOD__ . PHP_EOL . '*** "session constr" ***' . PHP_EOL . " = " . $dump . PHP_EOL, 3, '/home/jbeyer/error.log');
-        
         $this->init();
     }
     
@@ -18,6 +20,7 @@ class Session
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
+            $this->id = session_id();
         }
     }
 
@@ -106,5 +109,13 @@ class Session
         foreach ($parameter as $key => $value) {
             $_SESSION[$key] = $value;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
     }
 }
