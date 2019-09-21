@@ -9,6 +9,7 @@ use Check\Persistence\Condition\ConditionContainer\ConditionContainer;
 use Check\Persistence\ConditionQueryInterface;
 use Check\Persistence\PersistenceInterface;
 use Check\Persistence\Repository\Table\Table;
+use Exception;
 
 class BaseRepository implements BaseRepositoryInterface
 {
@@ -30,7 +31,7 @@ class BaseRepository implements BaseRepositoryInterface
      * @param Table $table
      * @param ConditionQueryInterface $conditionContainer
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function select(Table $table, ConditionQueryInterface $conditionContainer = null): array
     {
@@ -56,7 +57,7 @@ class BaseRepository implements BaseRepositoryInterface
     /**
      * @param Table $table
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     private function selectAll(Table $table)
     {
@@ -71,7 +72,7 @@ class BaseRepository implements BaseRepositoryInterface
      * @param Table $table
      * @param array $parameter
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function save(Table $table, array $parameter): array
     {
@@ -81,7 +82,7 @@ class BaseRepository implements BaseRepositoryInterface
             $parameter = $this->insert($table, $parameter);
         } else {
             if (!$table->hasPrimaryKey()) {
-                throw new \Exception(sprintf('table %s should have primary key to update table data', $table->getName()));
+                throw new Exception(sprintf('table %s should have primary key to update table data', $table->getName()));
             }
             $this->update($table, $parameter);
         }
@@ -100,7 +101,7 @@ class BaseRepository implements BaseRepositoryInterface
      * @param Table $table
      * @param array $parameter
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function insert(Table $table, array $parameter): array
     {
@@ -109,8 +110,8 @@ class BaseRepository implements BaseRepositoryInterface
             [
                 $this->generateInsert($table),
                 $this->generateSets($parameter),
-                ';',
-                'SELECT LAST_INSERT_ID() as id;'
+//                ';',
+//                'SELECT LAST_INSERT_ID() as id;'
             ]
         );
         
@@ -131,7 +132,7 @@ class BaseRepository implements BaseRepositoryInterface
      * @param Table $table
      * @param array $parameter
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function update(Table $table, array $parameter): array
     {

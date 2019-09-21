@@ -12,6 +12,7 @@ namespace Check\Persistence\Temporary;
 use Check\Persistence\Repository\Table\Table;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use StdClass;
 
 class TemporaryPersistenceTest extends TestCase
 {
@@ -121,11 +122,11 @@ class TemporaryPersistenceTest extends TestCase
             [ // this case should not happen in db there should only be easy types
                 [
                     'id_1' => 1,
-                    'field_1' => new \StdClass(),
+                    'field_1' => new StdClass(),
                 ],
                 [
                     'id_1' => 1,
-                    'field_1' => new \StdClass(),
+                    'field_1' => new StdClass(),
                 ],
 
             ],
@@ -143,17 +144,6 @@ class TemporaryPersistenceTest extends TestCase
         $this->temporaryPersistence->update($this->tableMock, $set);
         $this->temporaryPersistence->update($this->tableMock, $changedSet);
         $this->assertFalse($this->temporaryPersistence->hasUpdate($this->tableMock, $changedSet));
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function testHasUpdateException()
-    {
-        $set = [[],[]];
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('update is only allowed for one row');
-        $this->temporaryPersistence->hasUpdate($this->tableMock, $set);
     }
 
     /**
@@ -184,6 +174,17 @@ class TemporaryPersistenceTest extends TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testHasUpdateException()
+    {
+        $set = [[],[]];
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('update is only allowed for one entry');
+        $this->temporaryPersistence->hasUpdate($this->tableMock, $set);
     }
 
     /**

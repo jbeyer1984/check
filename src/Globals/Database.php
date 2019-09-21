@@ -4,11 +4,13 @@
 namespace Check\Globals;
 
 use Check\Persistence\PersistenceInterface;
+use Exception;
+use PDO;
 
 class Database implements PersistenceInterface
 {
     /**
-     * @var \PDO
+     * @var PDO
      */
     private $connection;
     
@@ -17,19 +19,18 @@ class Database implements PersistenceInterface
         $this->init();
     }
 
+    /**
+     * @throws Exception
+     */
     private function init()
     {
         try {
-            $this->connection = new \PDO('mysql:dbname=check;host=127.0.0.1', 'root', 'user20');
-        } catch (\Exception $e) {
+            $this->connection = new PDO('mysql:dbname=check;host=127.0.0.1', 'root', 'user20007');
+        } catch (Exception $e) {
+            throw new Exception('db could not be reached or evaluated');
             /** @TODO jbeyer log Exception */
         }
     }
-
-//    private function close()
-//    {
-//        $this->connection = null;
-//    }
 
     /**
      * @param string $sql
@@ -42,7 +43,7 @@ class Database implements PersistenceInterface
         $pdo = $this->connection;
         $statement = $pdo->prepare($sql);
         $statement->execute($parameter);
-        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 //        $this->close();
         
         return $result;
@@ -71,7 +72,7 @@ class Database implements PersistenceInterface
         $sql = 'SELECT LAST_INSERT_ID() AS id';
         $statement = $pdo->prepare($sql);
         $statement->execute([]);
-        $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         
         $id = $result[0]['id'];
 //        $this->close();

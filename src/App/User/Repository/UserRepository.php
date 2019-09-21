@@ -12,6 +12,7 @@ use Check\Persistence\ConditionQueryInterface;
 use Check\Persistence\Repository\BaseRepositoryInterface;
 use Check\Persistence\Repository\EntityRepositoryInterface;
 use Check\Persistence\Repository\Table\Table;
+use Exception;
 
 class UserRepository implements EntityRepositoryInterface
 {
@@ -57,7 +58,7 @@ class UserRepository implements EntityRepositoryInterface
     /**
      * @param int $id
      * @return LoggedInUser
-     * @throws \Exception
+     * @throws Exception
      */
     public function findById(int $id): LoggedInUser
     {
@@ -71,7 +72,7 @@ class UserRepository implements EntityRepositoryInterface
         }
         
         if (1 < count($result)) {
-            throw new \Exception(sprintf('User double existing in table=%s with id=%s, THAT SHOULD NOT HAPPEN', $this->table->getName(), $id));
+            throw new Exception(sprintf('User double existing in table=%s with id=%s, THAT SHOULD NOT HAPPEN', $this->table->getName(), $id));
         }
         
         return $this->userFactory->createLoggedInUserByRecordSet($result[0]);
@@ -100,16 +101,14 @@ class UserRepository implements EntityRepositoryInterface
     /**
      * @param ConditionQueryInterface $conditionContainer
      * @return LoggedInUser[]
-     * @throws \Exception
+     * @throws Exception
      */
     public function findBy(ConditionQueryInterface $conditionContainer): array
     {
         $result = $this->persistence->select($this->table, $conditionContainer);
 
         if (empty($result)) {
-            return [
-                $this->userFactory->createLoggedInUserDummy()
-            ];
+            return [];
         }
 
         $loggedInUsers = array_map(function($row) {

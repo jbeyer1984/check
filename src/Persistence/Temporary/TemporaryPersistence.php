@@ -7,6 +7,7 @@ namespace Check\Persistence\Temporary;
 use Check\Persistence\Repository\Table\EntityMapper;
 use Check\Persistence\Repository\Table\GeneralMapper;
 use Check\Persistence\Repository\Table\Table;
+use Exception;
 
 class TemporaryPersistence implements TemporaryPersistenceInterface
 {
@@ -18,14 +19,14 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
     /**
      * @param Table $table
      * @param array $result
-     * @throws \Exception
+     * @throws Exception
      */
     public function update(Table $table, array $result): void
     {
         if (isset($result[0])) {
             foreach ($result as $row) {
                 if (!is_array($row)) {
-                    throw new \Exception('$result must be type of array');
+                    throw new Exception('$result must be type of array');
                 }
                 $this->update($table, $row);
             }
@@ -34,7 +35,7 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
         
         if (!$table->hasPrimaryKey()) {
             /** @TODO implement only fields */
-            throw new \Exception(sprintf('table %s has no primary key', $table->getName()));
+            throw new Exception(sprintf('table %s has no primary key', $table->getName()));
         }
         
         $diffKeysNotFound = array_diff(
@@ -46,7 +47,7 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
         );
         
         if (!$allKeysFound) {
-            throw new \Exception(
+            throw new Exception(
                 sprintf(
                     'not all fields found in table=%s with keys=%s',
                     $table->getName(), implode(', ', $diffKeysNotFound)));
@@ -79,13 +80,13 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
      * @param Table $table
      * @param array $result
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function hasUpdate(Table $table, array $result): bool
     {
         if (isset($result[0])) {
             if (1 < count($result)) {
-                throw new \Exception('update is only allowed for one row'); 
+                throw new Exception('update is only allowed for one entry');
             }
             $result = $result[0];
         }
@@ -116,7 +117,7 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
      * @param Table $table
      * @param array $result
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getMapToUpdate(Table $table, array $result): array
     {
@@ -127,7 +128,7 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
         $incrementId = $this->generatedIncrementIdentifier($table, $result);
         $identifier = $this->generatedIdentifier($table, $incrementId);
         if (!isset($this->persistenceLookup[$identifier]['old'])) {
-            throw new \Exception(sprintf('at least product should be updated by id = %s one time before', $incrementId));
+            throw new Exception(sprintf('at least product should be updated by id = %s one time before', $incrementId));
         }
         
         $lastMap = $this->getLatestDeterminedMap($identifier);
@@ -152,12 +153,12 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
      * @param Table $table
      * @param array $result
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     private function generatedIncrementIdentifier(Table $table, array $result): string
     {
         if (!isset($result[$table->getPrimaryIdentifier()])) {
-            throw new \Exception(sprintf('table %s does not find auto persistence primary key in result', $table->getName()));
+            throw new Exception(sprintf('table %s does not find auto persistence primary key in result', $table->getName()));
         }
         
         return $result[$table->getPrimaryIdentifier()];

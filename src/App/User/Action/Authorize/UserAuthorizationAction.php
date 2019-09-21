@@ -9,6 +9,7 @@ use Check\App\User\Service\RegisterUserService;
 use Check\Controller\Action\ActionInterface;
 use Check\Controller\Action\AuthorizationInterface;
 use DI\Container;
+use Exception;
 
 class UserAuthorizationAction implements ActionInterface, AuthorizationInterface
 {
@@ -43,11 +44,14 @@ class UserAuthorizationAction implements ActionInterface, AuthorizationInterface
             $registerUserService = $this->container->get(RegisterUserService::class);
             
             $loggedInUser = $registerUserService->getAuthorizedUserByCredentials($userCredentials);
+            if (!$loggedInUser->isAuthorized()) {
+                return;
+            }
             
             $registerUserService->authorizeSessionByLoggedInUser($loggedInUser);
             
             $this->isAuthorized = $loggedInUser->isAuthorized();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // logging
             $this->isAuthorized = false;
         }
