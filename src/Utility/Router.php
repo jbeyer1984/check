@@ -28,6 +28,11 @@ class Router
             $controller->startAction();
         });
 
+        $router->match('GET', '/user/logout', function() {
+            $controller = new UserController();
+            $controller->logoutAction();
+        });
+
         $router->set404(function() {
             echo "not registered path for url";
 //            header('HTTP/1.1 404 Not Found');

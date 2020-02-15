@@ -43,7 +43,7 @@ class UserAuthorizationAction implements ActionInterface, AuthorizationInterface
             $userCredentials = $userParameterFactory->createUserCredentialsByRequest();
             $registerUserService = $this->container->get(RegisterUserService::class);
             
-            $loggedInUser = $registerUserService->getAuthorizedUserByCredentials($userCredentials);
+            $loggedInUser = $registerUserService->authorizedUserByCredentials($userCredentials);
             if (!$loggedInUser->isAuthorized()) {
                 return;
             }

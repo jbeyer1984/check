@@ -10,6 +10,7 @@ namespace Check\Persistence\Temporary;
 
 
 use Check\Persistence\Repository\Table\Table;
+use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use StdClass;
@@ -51,7 +52,7 @@ class TemporaryPersistenceTest extends TestCase
      * @dataProvider hasUpdateProvider
      * @param array $set
      * @param array $changedSet
-     * @throws \Exception
+     * @throws Exception
      */
     public function testHasUpdate($set, $changedSet)
     {
@@ -137,7 +138,7 @@ class TemporaryPersistenceTest extends TestCase
      * @dataProvider hasNoUpdateProvider
      * @param array $set
      * @param array $changedSet
-     * @throws \Exception
+     * @throws Exception
      */
     public function testHasNoUpdate($set, $changedSet)
     {
@@ -177,18 +178,18 @@ class TemporaryPersistenceTest extends TestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testHasUpdateException()
     {
         $set = [[],[]];
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('update is only allowed for one entry');
         $this->temporaryPersistence->hasUpdate($this->tableMock, $set);
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testUpdate()
     {
@@ -206,7 +207,7 @@ class TemporaryPersistenceTest extends TestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function testUpdateException()
     {
@@ -214,7 +215,7 @@ class TemporaryPersistenceTest extends TestCase
 //            'id_not_set' => 0,
             'field_1' => 'field_1_changed'
         ];
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('not all fields found in table=table_1 with keys=id_1');
         $this->temporaryPersistence->update($this->tableMock, $set);
         
@@ -237,7 +238,7 @@ class TemporaryPersistenceTest extends TestCase
      * @param array $set
      * @param array $setChanged
      * @param array $expectedMapToUpdate
-     * @throws \Exception
+     * @throws Exception
      */
     public function testGetMapToUpdate($set, $setChanged, $expectedMapToUpdate)
     {
@@ -279,5 +280,30 @@ class TemporaryPersistenceTest extends TestCase
                 ]
             ],
         ];
+    }
+
+    public function testExists()
+    {
+        $result = [
+            'id_1' => 1,
+            'field_1' => 'field_1',
+        ];
+
+        $this->assertFalse($this->temporaryPersistence->exists($this->tableMock, $result));
+        $this->temporaryPersistence->update($this->tableMock, $result);
+        $this->assertTrue($this->temporaryPersistence->exists($this->tableMock, $result));
+    }
+
+    public function testDelete()
+    {
+        $result = [
+            'id_1' => 1,
+            'field_1' => 'field_1',
+        ];
+
+        $this->temporaryPersistence->update($this->tableMock, $result);
+        $this->assertTrue($this->temporaryPersistence->exists($this->tableMock, $result));
+        $this->temporaryPersistence->delete($this->tableMock, $result);
+        $this->assertFalse($this->temporaryPersistence->exists($this->tableMock, $result));
     }
 }

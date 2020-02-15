@@ -4,14 +4,15 @@
 namespace Check\App\User\Repository;
 
 
-use Check\Persistence\Condition\Condition;
-use Check\Persistence\Condition\ConditionContainer\ConditionContainer;
 use Check\App\User\Factory\UserSessionFactory;
 use Check\App\User\UserSession;
+use Check\Persistence\Condition\Condition;
+use Check\Persistence\Condition\ConditionContainer\ConditionContainer;
 use Check\Persistence\ConditionQueryInterface;
 use Check\Persistence\Repository\BaseRepositoryInterface;
 use Check\Persistence\Repository\EntityRepositoryInterface;
 use Check\Persistence\Repository\Table\Table;
+use Exception;
 
 class UserSessionRepository implements EntityRepositoryInterface
 {
@@ -54,7 +55,7 @@ class UserSessionRepository implements EntityRepositoryInterface
     /**
      * @param int $id
      * @return UserSession
-     * @throws \Exception
+     * @throws Exception
      */
     public function findById(int $id): UserSession
     {
@@ -63,11 +64,11 @@ class UserSessionRepository implements EntityRepositoryInterface
         $result = $this->persistence->select($this->table, $conditionContainer);
 
         if (0 === count($result)) {
-            throw new \Exception(sprintf('UserSession not found in table=%s with id=%s', $this->table->getName(), $id));
+            throw new Exception(sprintf('UserSession not found in table=%s with id=%s', $this->table->getName(), $id));
         }
 
         if (1 < count($result)) {
-            throw new \Exception(sprintf('UserSession double existing in table=%s with id=%s, THAT SHOULD NOT HAPPEN', $this->table->getName(), $id));
+            throw new Exception(sprintf('UserSession double existing in table=%s with id=%s, THAT SHOULD NOT HAPPEN', $this->table->getName(), $id));
         }
 
         return $this->userSessionFactory->createUserSessionByRecordSet($result[0]);
@@ -76,7 +77,7 @@ class UserSessionRepository implements EntityRepositoryInterface
     /**
      * @param ConditionQueryInterface $conditionContainer
      * @return UserSession[]
-     * @throws \Exception
+     * @throws Exception
      */
     public function findBy(ConditionQueryInterface $conditionContainer): array
     {
@@ -102,5 +103,11 @@ class UserSessionRepository implements EntityRepositoryInterface
     {
         $userSessionMapper = $this->userSessionFactory->createUserSessionMapper($userSession);
         $this->persistence->save($this->table, $userSessionMapper->getMap());
+    }
+
+    public function delete(UserSession $userSession)
+    {
+        $loggedInUserMapper = $this->userSessionFactory->createUserSessionMapper($userSession);
+        $this->persistence->delete($this->table, $loggedInUserMapper->getMap());
     }
 }

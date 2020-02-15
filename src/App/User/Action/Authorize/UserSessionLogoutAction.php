@@ -1,27 +1,22 @@
 <?php
 
 
-namespace Check\App\User\Action\Create;
+namespace Check\App\User\Action\Authorize;
 
 
-use Check\App\User\LoggedInUser;
 use Check\App\User\Service\RegisterUserService;
 use Check\Controller\Action\ActionInterface;
 use DI\Container;
 
-class UserCreateAction implements ActionInterface
+class UserSessionLogoutAction implements ActionInterface
 {
     /**
      * @var Container
      */
     private $container;
-    /**
-     * @var LoggedInUser
-     */
-    private $loggedInUser;
 
     /**
-     * UserCreationAction constructor.
+     * UserAuthenticationAction constructor.
      * @param Container $container
      */
     public function __construct(Container $container)
@@ -36,7 +31,10 @@ class UserCreateAction implements ActionInterface
     public function execute()
     {
         $registerUserService = $this->container->get(RegisterUserService::class);
-        $this->loggedInUser = $registerUserService->authorizedUserBySession();
+        $isAuthorized = $registerUserService->authorizedUserBySession()->isAuthorized();
+        if ($isAuthorized) {
+            $registerUserService->logoutUserBySession();
+        }
     }
 
     /**
@@ -44,18 +42,6 @@ class UserCreateAction implements ActionInterface
      */
     public function getParameter()
     {
-        return [];
+        return  [];
     }
-
-    /**
-     * @return LoggedInUser
-     */
-    public function getLoggedInUser(): LoggedInUser
-    {
-        return $this->loggedInUser;
-    }
-    
-    
-    
-    
 }

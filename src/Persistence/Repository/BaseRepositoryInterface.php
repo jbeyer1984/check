@@ -13,4 +13,5 @@ interface BaseRepositoryInterface
     public function save(Table $table, array $parameter): array;
 //    public function insert(Table $table, array $map): void;
 //    public function update(Table $table, array $map): void;
+    public function delete(Table $table, array $parameter);
 }

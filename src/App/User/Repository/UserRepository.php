@@ -126,4 +126,10 @@ class UserRepository implements EntityRepositoryInterface
         $loggedInUserMapper = $this->userFactory->createLoggedInUserMapper($loggedInUser);
         $this->persistence->save($this->table, $loggedInUserMapper->getMap());
     }
+
+    public function delete(LoggedInUser $loggedInUser)
+    {
+        $loggedInUserMapper = $this->userFactory->createLoggedInUserMapper($loggedInUser);
+        $this->persistence->delete($this->table, $loggedInUserMapper->getMap());
+    }
 }

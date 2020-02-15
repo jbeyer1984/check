@@ -37,7 +37,7 @@ class UserSessionAuthorizationAction implements ActionInterface, AuthorizationIn
     public function execute()
     {
         $registerUserService = $this->container->get(RegisterUserService::class);
-        $this->isAuthorized = $registerUserService->getAuthorizedUserBySession()->isAuthorized();    
+        $this->isAuthorized = $registerUserService->authorizedUserBySession()->isAuthorized();
     }
 
     /**

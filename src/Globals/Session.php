@@ -4,6 +4,8 @@
 namespace Check\Globals;
 
 
+use Exception;
+
 class Session
 {
     /**
@@ -29,6 +31,11 @@ class Session
         session_destroy();
     }
 
+    public function destroy()
+    {
+        $this->close();
+    }
+
     /**
      * @param array $parameter
      * @return array
@@ -46,16 +53,16 @@ class Session
     /**
      * @param string $key
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function get(string $key)
     {
         if (!isset($_SESSION[$key])) {
             $this->close();
-            throw new \Exception(sprintf("session key does not exist, given %s", $key));
+            throw new Exception(sprintf("session key does not exist, given %s", $key));
         }
 
-        $this->close();
+//        $this->close();
 
         return $_SESSION[$key];
     }

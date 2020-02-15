@@ -141,6 +141,41 @@ class TemporaryPersistence implements TemporaryPersistenceInterface
 
     /**
      * @param Table $table
+     * @param array $result
+     * @throws Exception
+     */
+    public function delete(Table $table, array $result): void
+    {
+        if (!$this->exists($table, $result)) {
+            return;
+        }
+
+        $incrementId = $this->generatedIncrementIdentifier($table, $result);
+        $identifier = $this->generatedIdentifier($table, $incrementId);
+
+        unset($this->persistenceLookup[$identifier]);
+    }
+
+    /**
+     * @param Table $table
+     * @param array $result
+     * @return bool
+     * @throws Exception
+     */
+    public function exists(Table $table, array $result)
+    {
+        if (!isset($result[$table->getPrimaryIdentifier()])) {
+            throw new Exception(sprintf('table %s does not find auto persistence primary key in result', $table->getName()));
+        }
+
+        $incrementId = $this->generatedIncrementIdentifier($table, $result);
+        $identifier = $this->generatedIdentifier($table, $incrementId);
+
+        return isset($this->persistenceLookup[$identifier]);
+    }
+
+    /**
+     * @param Table $table
      * @param int $incrementId
      * @return string
      */

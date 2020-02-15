@@ -16,6 +16,7 @@ use Check\Persistence\Condition\Condition;
 use Check\Persistence\Condition\ConditionContainer\ConditionContainer;
 use Check\Persistence\Condition\ConditionContainer\ConditionWrapper;
 use DI\Container;
+use Exception;
 
 class RegisterUserService
 {
@@ -36,9 +37,9 @@ class RegisterUserService
     /**
      * @param UserCredentials $userCredentials
      * @return LoggedInUser
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getAuthorizedUserByCredentials(UserCredentials $userCredentials): LoggedInUser
+    public function authorizedUserByCredentials(UserCredentials $userCredentials): LoggedInUser
     {
         $userRepository = $this->container->get(UserRepository::class);
         $conditionContainer = (ConditionContainer::And())
@@ -80,9 +81,9 @@ class RegisterUserService
      * @return LoggedInUser
      * @throws \DI\DependencyException
      * @throws \DI\NotFoundException
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getAuthorizedUserBySession(): LoggedInUser
+    public function authorizedUserBySession(): LoggedInUser
     {
         $session               = $this->container->get(Session::class);
         $userSessionRepository = $this->container->get(UserSessionRepository::class);
@@ -97,13 +98,29 @@ class RegisterUserService
         }
         
         if (1 < count($userSessions)) {
-            throw new \Exception(sprintf('user session already exists with session_id = %s, SHOULD NOT HAPPEN', $session->getId()));
+            throw new Exception(sprintf('user session already exists with session_id = %s, SHOULD NOT HAPPEN', $session->getId()));
         }
         
         $userSession = $userSessions[0];
         
         return $this->container->get(UserRepository::class)->findById($userSession->getUserId());
     }
+
+    public function logoutUserBySession(): void
+    {
+        $session               = $this->container->get(Session::class);
+        $userSessionRepository = $this->container->get(UserSessionRepository::class);
+        $userSessions          = $userSessionRepository->findBy(
+            (ConditionContainer::And())
+                ->add(Condition::operator('session_id', '=', $session->getId()))
+        );
+        if (!empty($userSessions)) {
+            $userSession = $userSessions[0];
+            $userSessionRepository->delete($userSession);
+        }
+    }
+
+
 
     /**
      * @param UserCredentials $userCredentials

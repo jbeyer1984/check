@@ -6,5 +6,6 @@
 </head>
 <body>
     Welcome user <?= $user->getName() ?>
+    <a href="/user/logout">Logout</a>
 </body>
 </html>

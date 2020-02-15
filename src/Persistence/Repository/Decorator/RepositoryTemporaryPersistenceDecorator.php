@@ -82,4 +82,14 @@ class RepositoryTemporaryPersistenceDecorator implements BaseRepositoryInterface
         
         return $parameter;
     }
+
+    /**
+     * @param Table $table
+     * @param array $parameter
+     */
+    public function delete(Table $table, array $parameter): void
+    {
+        $this->repository->delete($table, $parameter);
+        $this->temporaryPersistence->delete($table, $parameter);
+    }
 }

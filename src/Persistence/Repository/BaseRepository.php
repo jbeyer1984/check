@@ -154,6 +154,28 @@ class BaseRepository implements BaseRepositoryInterface
         return $parameter;
     }
 
+    public function delete(Table $table, array $parameter): void
+    {
+        $primaryIdentifier = $table->getPrimaryIdentifier();
+        $whereCondition = ConditionContainer::And()
+            ->add(Condition::operator($primaryIdentifier, '=', $parameter[$primaryIdentifier]))
+        ;
+
+        $executeString = implode(
+            PHP_EOL,
+            [
+                $this->generateDelete($table),
+                $this->generateWhere($whereCondition),
+            ]
+        );
+
+        $parameter = [
+            $primaryIdentifier => $parameter[$primaryIdentifier]
+        ];
+
+        $this->persistence->execute($executeString, $parameter);
+    }
+
     /**
      * @param Table $table
      * @return string
@@ -224,6 +246,16 @@ SQL;
         $tableName = $table->getName();
         $sql = <<<SQL
 UPDATE {$tableName}
+SQL;
+
+        return $sql;
+    }
+
+    private function generateDelete(Table $table)
+    {
+        $tableName = $table->getName();
+        $sql = <<<SQL
+DELETE FROM {$tableName}
 SQL;
 
         return $sql;

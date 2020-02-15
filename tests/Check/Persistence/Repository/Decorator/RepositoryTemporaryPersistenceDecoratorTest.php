@@ -77,4 +77,16 @@ class RepositoryTemporaryPersistenceDecoratorTest extends TestCase
         $parameterOutput = $this->repositoryTemporaryPersistenceDecorator->save($table, $parameterInput);
         $this->assertEquals($parameterInput, $parameterOutput);
     }
+
+    public function testDelete()
+    {
+        /** @var Table|MockObject $table */
+        $table = $this->createMock(Table::class);
+        $table->expects($this->any())->method('getPrimaryIdentifier')->willReturn('id');
+        $parameterInput = ['id' => 0, 'field_1' => 'field_1'];
+        $parameterOutput = $this->repositoryTemporaryPersistenceDecorator->save($table, $parameterInput);
+        $this->assertEquals($parameterInput, $parameterOutput);
+
+        $this->repositoryTemporaryPersistenceDecorator->delete($table, $parameterOutput);
+    }
 }

@@ -5,6 +5,7 @@ namespace Check\App\Controller;
 
 
 use Check\App\Controller\Action\UserStartAction;
+use Check\App\User\Action\Authorize\UserSessionLogoutAction;
 use Check\Controller\BaseController;
 use Check\Globals\Renderer;
 use Check\Globals\Request;
@@ -57,5 +58,22 @@ class UserController extends BaseController
         }
 
         $this->renderer->render(['home', 'start.html.php'], $action->getParameter());
+    }
+
+    /**
+     * @throws \DI\DependencyException
+     * @throws \DI\NotFoundException
+     */
+    public function logoutAction()
+    {
+        $action = new UserStartAction($this->container);
+        $action->execute();
+        if (!$action->isAuthorized()) {
+            $this->request->redirect('/user/login');
+        }
+        $action = new UserSessionLogoutAction($this->container);
+        $action->execute();
+
+        $this->request->redirect('/user/login');
     }
 }

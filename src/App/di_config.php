@@ -15,7 +15,7 @@ use Check\Persistence\Temporary\TemporaryPersistence;
 
 return [
     
-    BaseRepository::class        => create()
+    BaseRepository::class => create()
         ->constructor(
             get(Database::class),
             get(TemporaryPersistence::class)
@@ -30,7 +30,7 @@ return [
     
 //    BaseRepositoryInterface::class => create()
 //        ->constructor(BaseRepository::class, $)
-    UserRepository::class        => create()
+    UserRepository::class => create()
         ->constructor(
             get('persistence'),
             get(UserFactory::class)
