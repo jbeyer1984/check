@@ -101,16 +101,9 @@ class HtmlBuilder
         if (!empty($div->getAttributes())) {
             $attributesString .=  ' ' . implode(' ', $div->getAttributes());
         }
-        $styleString = '';
-        $stylesNotEmpty = !empty($div->getStyles()) || !empty($div->getMinorStyles());
-        if ($stylesNotEmpty) {
-            $styles = array_merge($div->getStyles(), $div->getMinorStyles());
-            $styleString .= ' style="' . implode('; ', $styles) . '"';
-        }
-
 
         return <<<HTML
-{$indentString}<div{$classString}{$attributesString}{$styleString}>
+{$indentString}<div{$classString}{$attributesString}>
 HTML;
     }
 

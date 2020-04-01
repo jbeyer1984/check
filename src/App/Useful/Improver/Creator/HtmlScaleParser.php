@@ -68,8 +68,6 @@ class HtmlScaleParser
         $statement = StringUtility::extractBetweenIdentifier($identifier, $cmd);
         if (!empty($statement)) {
             $exploded = explode(',', $statement);
-            $dump = print_r($exploded, true);
-            print_r(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' mit ' . __METHOD__ . PHP_EOL . '* $exploded *' . PHP_EOL . " = " . $dump . PHP_EOL);
 
             foreach ($exploded as $class) {
                 if (false !== strpos($class, 'ff=')) {
@@ -78,7 +76,7 @@ class HtmlScaleParser
                         throw new Exception('there should be one assignment for fs=');
                     }
                     $font = $expl[1];
-                    $this->styles[] = 'font-family:' . $font;
+                    $this->styles[] = 'font-family: ' . $font;
                 }
                 if (false !== strpos($class, 'fs=')) {
                     $expl = explode('=', $class);
@@ -87,7 +85,7 @@ class HtmlScaleParser
                     }
                     $size = $expl[1];
                     $size = StringUtility::appendedOneTime($size, 'px');
-                    $this->styles[] = 'font-size:' . $size;
+                    $this->styles[] = 'font-size: ' . $size;
                 }
                 if (false !== strpos($class, 'fsM=')) {
                     $expl = explode('=', $class);
@@ -96,9 +94,9 @@ class HtmlScaleParser
                     }
                     $height = $expl[1];
                     $heightPx = StringUtility::appendedOneTime($height, 'px');
-                    $this->styles[] = 'font-size:' . $heightPx;
-                    $this->attributes[] = 'max-height="' . $height . '"';
-                    $this->attributes[] = 'max-fontsize="' . $height . '"';
+                    $this->styles[] = 'font-size: ' . $heightPx;
+                    $this->attributes[] = 'data-maxheight="' . $height . '"';
+                    $this->attributes[] = 'data-fontsize="' . $height . '"';
                 }
             }
         }

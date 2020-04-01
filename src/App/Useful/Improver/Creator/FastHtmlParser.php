@@ -54,20 +54,10 @@ class FastHtmlParser
     public function execute()
     {
         $lines = explode(PHP_EOL, $this->text);
-        $inputCharacterPosition = 0;
+        $inputCharacterPosition = -1;
         $this->div = DivBuilder::byString('root');
         $this->_recFill($this->div, $lines, $inputCharacterPosition);
         $this->_traverseToDivIdentifiers($this->div, 0);
-//        $dump = print_r($this->divIdentifiers, true);
-//        print_r(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' mit ' . __METHOD__ . PHP_EOL . '* $this->divIdentifiers *' . PHP_EOL . " = " . $dump . PHP_EOL);
-    }
-
-    /**
-     * @return string
-     */
-    public function getOutputHtml(): string
-    {
-        return $this->outputHtml;
     }
 
     /**

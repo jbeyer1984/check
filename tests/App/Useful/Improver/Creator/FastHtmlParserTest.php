@@ -11,11 +11,12 @@ class FastHtmlParserTest extends TestCase
     public function testExecute()
     {
         $text = <<<TXT
-a
-a[30,30]
- b;a;
-  wc"auto";pos=a,ta=center;(1920,1080)[20,20]*fsM=80,ff='Sans-Serif'*
-   c
+fio-component
+ wfio-logo;pos=a,ta=center;(100,200)[30,30]
+  fio-logo(100,200)
+  b;pos=a;
+   wc"auto";pos=a,ta=center;(1920,1080)[20,20]*fsM=80,ff='Sans-Serif'*
+    c
 TXT;
 
         $htmlParser = FastHtmlParser::byText($text);

@@ -101,7 +101,7 @@ class StyleHtmlParser
                         throw new Exception('there should be one assignment for ta=');
                     }
                     $definition = $expl[1];
-                    $this->minorStyles[] = 'text-align:' . $definition;
+                    $this->minorStyles[] = 'text-align: ' . $definition;
                 } else {
                     $this->minorStyles[] = $style;
                 }
@@ -128,8 +128,8 @@ class StyleHtmlParser
             $height = $exploded[1];
             $width = StringUtility::appendedOneTime($width, 'px');
             $height = StringUtility::appendedOneTime($height, 'px');
-            $this->styles[] = 'width:' . $width;
-            $this->styles[] = 'height:' . $height;
+            $this->styles[] = 'width: ' . $width;
+            $this->styles[] = 'height: ' . $height;
         }
 
         return '(' . $statement . ')';
@@ -152,8 +152,8 @@ class StyleHtmlParser
             $marginTop = $exploded[1];
             $marginLeft = StringUtility::appendedOneTime($marginLeft, 'px');
             $marginTop = StringUtility::appendedOneTime($marginTop, 'px');
-            $this->styles[] = 'margin-left:' . $marginLeft;
-            $this->styles[] = 'margin-top:' . $marginTop;
+            $this->styles[] = 'margin-left: ' . $marginLeft;
+            $this->styles[] = 'margin-top: ' . $marginTop;
         }
 
         return '[' . $statement . ']';

@@ -13,6 +13,11 @@ class LessBuilder
      */
     private $div;
 
+    /**
+     * @var string
+     */
+    private $less;
+
     const INDENT = '    ';
 
     /**
@@ -44,9 +49,9 @@ class LessBuilder
 
     public function build()
     {
-        $less = $this->_builtLess($this->div, 0);
-        $dump = print_r($less, true);
-        print_r(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' mit ' . __METHOD__ . PHP_EOL . '* $html *' . PHP_EOL . " = " . $dump . PHP_EOL);
+        $this->less = $this->_builtLess($this->div, 0);
+//        $dump = print_r($less, true);
+//        print_r(PHP_EOL . '-$- in ' . basename(__FILE__) . ':' . __LINE__ . ' mit ' . __METHOD__ . PHP_EOL . '* $html *' . PHP_EOL . " = " . $dump . PHP_EOL);
     }
 
 
@@ -65,12 +70,14 @@ class LessBuilder
             } else {
                 $less .= PHP_EOL;
                 $less .= $this->lessBlockHead($div, $indent);
-                $less .= PHP_EOL;
+                if ('root_cl' !== $div->getParent()->getClasses()[0]) {
+                    $less .= PHP_EOL;
+                }
                 $styles = array_merge($div->getStyles(), $div->getMinorStyles());
                 if (!empty($styles)) {
                     $indentString = str_repeat(self::INDENT, $indent+1);
-                    $styleBlock = implode(PHP_EOL . $indentString, $styles);
-                    $less .= $indentString . $styleBlock;
+                    $styleBlock = implode(';' . PHP_EOL . $indentString, $styles);
+                    $less .= $indentString . $styleBlock . ';';
                 }
                 $less .= $this->_builtLess($div, $indent+1);
                 $less .= PHP_EOL;
@@ -122,5 +129,13 @@ class LessBuilder
         $indentString = str_repeat(self::INDENT, $indent);
 
         return $indentString . '}';
+    }
+
+    /**
+     * @return string
+     */
+    public function getLess(): string
+    {
+        return $this->less;
     }
 }
